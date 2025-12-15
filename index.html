@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AV8Rs Planespotter Live Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #000;
+      color: #fff;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: #0b1220;
+      font-weight: bold;
+    }
+
+    header img {
+      height: 30px;
+    }
+
+    #container {
+      display: flex;
+      height: calc(100vh - 50px);
+      width: 100%;
+    }
+
+    #sidebar {
+      width: 240px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 12px;
+      overflow-y: auto;
+    }
+
+    @media (max-width: 768px) {
+      #sidebar {
+        width: 170px;
+        font-size: 13px;
+      }
+    }
+
+    #sidebar h3 {
+      margin: 10px 0 6px;
+      font-size: 14px;
+      border-bottom: 1px solid #333;
+      padding-bottom: 4px;
+    }
+
+    .aircraft {
+      background: #111;
+      padding: 6px;
+      border-radius: 5px;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+
+    input {
+      width: 100%;
+      margin-bottom: 6px;
+      padding: 6px;
+      border-radius: 4px;
+      border: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 8px;
+      background: #1e90ff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    #map {
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <img src="logo.png" alt="Logo" />
+  AV8Rs Bangladesh – Live Planespotter Map
+</header>
+
+<div id="container">
+
+  <div id="sidebar">
+    <h1>Incoming Aircraft</h1>
+     <h3>Aircrafts</h3>
+         <div class="aircraft"><b>FORMATION 1</b> <br>✈ Grob 120TP <br>✈ L-410</div>
+         <div class="aircraft"><b>FORMATION 2</b> <br>✈ F-7BGI <br>✈ F-7MB </div>
+         <div class="aircraft"><b>FORMATION 3</b> <br>✈ PT-6 </div>
+         <div class="aircraft"><b>FORMATION 4</b> <br>✈ 5x K-8W </div>
+         <div class="aircraft"><B>Paratroops </B> <BR>✈ C-130</div>
+         <div class="aircraft"><B>NAVY </B> <BR>✈ D228</div>
+            <div class="aircraft"><B>ARMY </B> <br>✈ Cessna 152 <br>✈ C295</div>
+         <div class="aircraft"><B>FINAL </B> <BR>✈ MIG29</div>
+         <div class="aircraft"><B>HELICOPTERS </B> <BR>🚁 Mil-171sh <br>🚁 AW119 <br>🚁 Bell 206 <br>🚁 bell 407GXI <br>🚁 AW109 </div>
+
+
+
+     <h3>Add Spotter</h3>
+    <input id="name" placeholder="Name" />
+    <input id="phone" placeholder="Phone" />
+    <input id="device" placeholder="Device" />
+    <button onclick="addSpotter()">Add My Location</button>
+  </div>
+
+  <div id="map"></div>
+
+</div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+  // Initialize map (Dhaka Airport)
+  const map = L.map('map').setView([23.778047484729505, 90.38298729166861], 13);
+
+  // Google Maps tiles
+  L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+    maxZoom: 20,
+    subdomains: ['mt0','mt1','mt2','mt3']
+  }).addTo(map);
+
+  // Event Meet Point
+  L.marker([23.778047484729505, 90.38298729166861])
+    .addTo(map)
+    .bindPopup('📍 Event Meet Point<br><a href="https://www.google.com/maps?q=23.8433,90.3978" target="_blank">Open in Google Maps</a>');
+
+  // Manual spotter add
+  function addSpotter() {
+    if (!navigator.geolocation) {
+      alert('Geolocation not supported');
+      return;
+    }
+
+    const name = document.getElementById('name').value || 'Unknown';
+    const phone = document.getElementById('phone').value || 'N/A';
+    const device = document.getElementById('device').value || 'N/A';
+
+    navigator.geolocation.getCurrentPosition(pos => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+
+      L.marker([lat, lng])
+        .addTo(map)
+        .bindPopup(`✈ ${name}<br>📞 ${phone}<br>📱 ${device}<br><a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank">Open in Google Maps</a>`)
+        .openPopup();
+
+      map.setView([lat, lng], 15);
+    }, () => {
+      alert('Location permission denied');
+    });
+  }
+</script>
+
+</body>
+</html>
